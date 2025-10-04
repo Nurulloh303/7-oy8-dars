@@ -1,6 +1,11 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 
+class Color(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Color")
+    def __str__(self):
+        return f"{self.name}"
+
 class Car(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
@@ -17,6 +22,7 @@ class Car(models.Model):
         ]
     )
     mileage = models.IntegerField(validators=[MinValueValidator(0)])
+    color = models.ForeignKey(Color, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.name} {self.brand}"
@@ -30,3 +36,4 @@ class Owner(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
