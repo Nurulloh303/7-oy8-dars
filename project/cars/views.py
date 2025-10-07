@@ -1,8 +1,12 @@
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status, generics, permissions
+from .permissions import MyPermission
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 from .models import Car, Owner, Color
 from .serializers import CarSerializer, OwnerSerializer, ColorSerializer
@@ -11,7 +15,12 @@ from .serializers import CarSerializer, OwnerSerializer, ColorSerializer
 class CarApiView(generics.ListAPIView):
     queryset = Car.objects.order_by('-id')
     serializer_class = CarSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdminUser]
+    permission_classes = [MyPermission]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_fields = ['name', 'color']
+    search_fields = ['name', 'brand']
+    ordering_fields = ['name', 'price']
+
 
     def get_queryset(self):
         q = self.queryset.all()
@@ -35,6 +44,12 @@ class OwnerDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Owner.objects.all()
     serializer_class = OwnerSerializer
     permission_classes = (permissions.IsAdminUser)
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    django_filters = ['first_name']
+    search_fields = ['first_name', 'phone_number']
+    ordering_fields = ['first_name', 'age']
+
+
 
 
     def get_queryset(self):
@@ -48,6 +63,10 @@ class ColorDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Color.objects.all()
     serializer_class = ColorSerializer
     permission_classes = (permissions.IsAdminUser)
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    django_filters = ['name']
+    search_fields = ['name']
+    ordering_fields = ['name']
 
 
 
