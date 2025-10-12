@@ -1,8 +1,12 @@
 from django.urls import path
-from .views import CarDetailAPIView, ColorDetailAPIView, OwnerDetailAPIView, CarApiView
+from .views import  ColorDetailAPIView, OwnerDetailAPIView, CarApiView
+from rest_framework.routers import SimpleRouter, DefaultRouter
+
+router = DefaultRouter()
+router.register('cars', CarApiView, basename='car')
 
 urlpatterns = [
-    path('cars/', CarApiView.as_view()),
-    path('cars/<int:pk>/', CarDetailAPIView.as_view()),
     path('owners/', OwnerDetailAPIView.as_view()),
 ]
+
+urlpatterns += router.urls

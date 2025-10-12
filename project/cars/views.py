@@ -3,47 +3,49 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework import status, generics, permissions
+from rest_framework import status, generics, permissions, viewsets
 from .permissions import MyPermission
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
+
 
 
 from .models import Car, Owner, Color
 from .serializers import CarSerializer, OwnerSerializer, ColorSerializer
 
 
-class CarApiView(generics.ListAPIView):
-    queryset = Car.objects.order_by('-id')
+class CarApiView(viewsets.ModelViewSet):
+    # queryset = Car.objects.order_by('-id')
+
     serializer_class = CarSerializer
-    permission_classes = [MyPermission]
+
+    permission_classes = [permissions.IsAuthenticated]
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filter_fields = ['name', 'color']
     search_fields = ['name', 'brand']
     ordering_fields = ['name', 'price']
 
-
     def get_queryset(self):
-        q = self.queryset.all()
-        return q
-
-    def get_serializer_class(self):
-        if self.request.user.is_staff:
-            r = CarSerializer
-        else:
-            r = self.serializer_class
-        return r
+        return Car.objects.all()
 
 
-class CarDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Car.objects.all()
-    serializer_class = CarSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, permissions.IsAdminUser)
+
+
+
+# class CarDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Car.objects.all()
+#     serializer_class = CarSerializer
+#     permission_classes = (permissions.IsAuthenticatedOrReadOnly, permissions.IsAdminUser)
 
 
 class OwnerDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Owner.objects.all()
+    # queryset = Owner.objects.all()
+
     serializer_class = OwnerSerializer
-    permission_classes = (permissions.IsAdminUser)
+
+    # permission_classes = (permissions.IsAdminUser)
+    
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     django_filters = ['first_name']
     search_fields = ['first_name', 'phone_number']
